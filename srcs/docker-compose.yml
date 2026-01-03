@@ -3,9 +3,9 @@ services:
     build:
       context: ./requirements/nginx
       dockerfile: .
+    container_name: ngnix
     ports:
       - "80:80"
-
     networks:
       - inseption
 
@@ -13,6 +13,7 @@ services:
     build:
       context: ./requirements/wordpress
       dockerfile: .
+    container_name: wordpress
     networks:
       - inseption
 
