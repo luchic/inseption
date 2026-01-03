@@ -1,5 +1,22 @@
 services:
   nginx:
-    build: requirements/nginx/.
+    build:
+      context: ./requirements/nginx
+      dockerfile: .
     ports:
       - "80:80"
+
+    networks:
+      - inseption
+
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+      dockerfile: .
+    networks:
+      - inseption
+
+networks:
+  inseption:
+    driver:
+      "bridge"
