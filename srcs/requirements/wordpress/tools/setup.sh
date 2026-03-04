@@ -32,4 +32,9 @@ fi
 
 echo "Finished to setup wp-config..."
 
+# chmod -R 766 /var/www/html
+chown -R www-data:www-data /var/www/html
+
+mv /conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
+
 exec "$@"
