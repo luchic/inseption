@@ -11,7 +11,7 @@ services:
       - NGNIX_KEY_FILE=/run/secrets/ngnix_key
     ports:
       - "8443:443"
-      - "8088:8088"
+      # - "8088:8088"
     networks:
       - inseption
     depends_on:
@@ -19,6 +19,9 @@ services:
     secrets:
       - ngnix_crt
       - ngnix_key
+    volumes:
+      - ./requirements/nginx/conf/defualt.conf:/etc/nginx/conf.d/defualt.conf
+      - web-data:/var/www/html
 
   wordpress:
     build:
@@ -36,6 +39,10 @@ services:
       - inseption
     depends_on:
       - mariadb
+    volumes:
+      - ./requirements/wordpress/conf/www.conf:/etc/php/8.2/fpm/pool.d/www.conf
+      - web-data:/var/www/html
+
 
   mariadb:
     build:
@@ -54,6 +61,8 @@ services:
       - db_admin_password
     networks:
       - inseption
+    volumes:
+      - ./requirements/mariadb/conf/server.cnf:/etc/mysql/mariadb.conf.d/50-server.cnf
 
 networks:
   inseption:
@@ -71,3 +80,11 @@ secrets:
     file: ./secrets/ssl/nginx.crt
   ngnix_key:
     file: ./secrets/ssl/nginx.key
+
+volumes:
+  web-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./web
