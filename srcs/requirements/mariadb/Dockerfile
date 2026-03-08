@@ -13,4 +13,4 @@ RUN chmod +x /setup.sh
 EXPOSE 3306
 
 ENTRYPOINT ["/setup.sh"]
-CMD ["mysqld"]
+CMD ["mysqld", "--user=root"]
