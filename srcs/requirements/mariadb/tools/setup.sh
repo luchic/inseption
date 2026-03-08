@@ -22,8 +22,15 @@ else
 	DB_ADMIN_USER=$(cat "$DB_ADMIN_USER_FILE")
 fi
 
-mkdir -p /run/mysqld
-chown mysql:mysql /run/mysqld
+
+#[ERROR] Can't start server : Bind on unix socket: No such file or directory
+#[ERROR] Do you already have another server running on socket: /var/run/mysqld/mysqld.sock ?
+#[ERROR] Aborting
+# This folder just doesn't exist in docker, and that why mariadb 
+# can't create socket by that director: /var/run/mysqld/mysqld.sock
+
+mkdir -p /var/run/mysqld/
+chown mysql:mysql /var/run/mysqld/
 
 mysqld --user=root &
 
@@ -49,13 +56,3 @@ echo "Is finished..."
 mysqladmin -u root shutdown
 
 exec "$@"
-
-
-# create database if not exists ${DB_NAME};
-
-# create user if not exists ${DB_USER}@'%' identified by '${DB_PASSWORD}';
-# grant all privileges on '${DB_NAME}'.* to '${DB_USER}'@'%';
-
-# create user if not exists ${DB_ADMIN_USER}@'%' identified by '${DB_ADMIN_PASSWORD}';
-# grant all privileges on *.* to '${DB_ADMIN_USER}'@'%' with grant option;
-
