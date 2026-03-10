@@ -15,14 +15,6 @@ else
 	DB_ADMIN_PASSWORD=$(cat "$DB_ADMIN_PASSWORD_FILE")
 fi
 
-if [[ -z "$DB_ADMIN_USER_FILE" ]]; then
-	echo "no secret: DB_ADMIN_USER_FILE"
-	exit 1
-else
-	DB_ADMIN_USER=$(cat "$DB_ADMIN_USER_FILE")
-fi
-
-
 #[ERROR] Can't start server : Bind on unix socket: No such file or directory
 #[ERROR] Do you already have another server running on socket: /var/run/mysqld/mysqld.sock ?
 #[ERROR] Aborting

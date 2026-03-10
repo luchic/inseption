@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: ngnix
     env_file:
-      - path: ./.env
+      - path: ./env/.env
         required: true
     ports:
       - "8443:443"
@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile
     container_name: wordpress
     env_file:
-      - path: ./.env
+      - path: ./env/.env
         required: true
     secrets:
       - db_password
@@ -47,11 +47,10 @@ services:
       dockerfile: Dockerfile
     container_name: mariadb
     env_file:
-      - path: ./.env
+      - path: ./env/.env
         required: true
     secrets:
       - db_password
-      - db_admin_user
       - db_admin_password
     networks:
       - inseption
@@ -67,8 +66,6 @@ networks:
 secrets:
   db_password:
     file: ./secrets/db_password.txt
-  db_admin_user:
-    file: ./secrets/db_admin_user.txt
   db_admin_password:
     file: ./secrets/db_admin_password.txt
   ngnix_crt:
