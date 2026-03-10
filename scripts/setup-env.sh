@@ -25,9 +25,8 @@ if [[ ! -d "${SSL_FOLDER}" ]]; then
 fi
 
 if [[ ! -f ${PSW_FILE} ]]; then
-    echo "Enter passwrod, othewise generate"
-
-	read -s password
+	read -s -p "Enter password (leave empty to generate): " password
+	echo
 	if [[ "$password" != "" ]]; then
 		echo "$password" > "${PSW_FILE}"
 	else
@@ -36,9 +35,8 @@ if [[ ! -f ${PSW_FILE} ]]; then
 fi
 
 if [[ ! -f "${PSW_ADMIN_FILE}" ]]; then
-	echo "Enter admin passwrod, othewise generate"
-
-	read -s admin_password
+	read -s -p "Enter admin password (leave empty to generate): " admin_password
+	echo
 	if [[ "$admin_password" != "" ]]; then
 		echo "$admin_password" > "${PSW_ADMIN_FILE}"
 	else
