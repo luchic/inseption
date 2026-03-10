@@ -15,12 +15,28 @@ do
     sleep 2
 done
 
-cd /var/www/html/wordpress
 
-echo "Try to Setup wp-config..."
+if [[ ! -f /var/www/html/wp-config-sample.php ]]; then
+	echo "Try to download wordpress files ..."
+
+	mkdir -p /var/www/html
+	
+	
+	if ! wget https://wordpress.org/latest.tar.gz -P /tmp; then
+		echo "Couldn't download wordpress files"
+		exit 1
+	fi
+
+	tar -xzf /tmp/latest.tar.gz -C /tmp/
+	cp -a /tmp/wordpress/. /var/www/html
+	rm -fr /tmp/wordpress /tmp/latest.tar.gz
+
+fi
+
+cd /var/www/html
 
 if [ ! -f wp-config.php ]; then
-	echo "Setuping wp-config..."
+	echo "Try to Setup wp-config..."
 
     cp wp-config-sample.php wp-config.php
 
@@ -30,11 +46,9 @@ if [ ! -f wp-config.php ]; then
     sed -i "s/localhost/$DB_HOST/" wp-config.php
 fi
 
-echo "Finished to setup wp-config..."
-
-# chmod -R 766 /var/www/html
+# chmod -R 777 /var/www/html | it need execute permisens or just chown
 chown -R www-data:www-data /var/www/html
 
-mv /conf/www.conf /etc/php/8.2/fpm/pool.d/www.conf
+echo "Finished to setup wordpress"
 
 exec "$@"
