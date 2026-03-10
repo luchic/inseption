@@ -6,12 +6,11 @@ services:
       context: ./requirements/nginx
       dockerfile: Dockerfile
     container_name: ngnix
-    environment:
-      - NGNIX_CRT_FILE=/run/secrets/ngnix_crt
-      - NGNIX_KEY_FILE=/run/secrets/ngnix_key
+    env_file:
+      - path: ./.env
+        required: true
     ports:
       - "8443:443"
-      # - "8088:8088"
     networks:
       - inseption
     depends_on:
@@ -28,11 +27,9 @@ services:
       context: ./requirements/wordpress
       dockerfile: Dockerfile
     container_name: wordpress
-    environment:
-      - DB_NAME=wordpress
-      - DB_USER=wordpress
-      - DB_PASSWORD_FILE=/run/secrets/db_password
-      - DB_HOST=mariadb
+    env_file:
+      - path: ./.env
+        required: true
     secrets:
       - db_password
     networks:
@@ -49,12 +46,9 @@ services:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
     container_name: mariadb
-    environment:
-      - DB_NAME=wordpress
-      - DB_USER=wordpress
-      - DB_PASSWORD_FILE=/run/secrets/db_password
-      - DB_ADMIN_USER_FILE=/run/secrets/db_admin_user
-      - DB_ADMIN_PASSWORD_FILE=/run/secrets/db_admin_password
+    env_file:
+      - path: ./.env
+        required: true
     secrets:
       - db_password
       - db_admin_user
@@ -63,6 +57,7 @@ services:
       - inseption
     volumes:
       - ./requirements/mariadb/conf/server.cnf:/etc/mysql/mariadb.conf.d/50-server.cnf
+      - data-base:/var/lib/mysql
 
 networks:
   inseption:
@@ -87,4 +82,5 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./web
+      device: /home/nluchini/data/
+  data-base:
