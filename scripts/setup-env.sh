@@ -27,7 +27,7 @@ fi
 if [[ ! -f ${PSW_FILE} ]]; then
     echo "Enter passwrod, othewise generate"
 
-	read password
+	read -s password
 	if [[ "$password" != "" ]]; then
 		echo "$password" > "${PSW_FILE}"
 	else
@@ -38,7 +38,7 @@ fi
 if [[ ! -f "${PSW_ADMIN_FILE}" ]]; then
 	echo "Enter admin passwrod, othewise generate"
 
-	read admin_password
+	read -s admin_password
 	if [[ "$admin_password" != "" ]]; then
 		echo "$admin_password" > "${PSW_ADMIN_FILE}"
 	else
