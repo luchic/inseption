@@ -1,5 +1,10 @@
 #!/bin/bash
 
+SECRET_FOLDER="srcs/secrets"
+SSL_FOLDER="${SECRET_FOLDER}/ssl"
+PSW_FILE="${SECRET_FOLDER}/db_password.txt"
+PSW_ADMIN_FILE="${SECRET_FOLDER}/db_admin_password.txt"
+
 set -e
 
 echo "Setting up environment..."
@@ -11,18 +16,34 @@ if [[ ! -f srcs/.env ]]; then
 fi
 
 # create secrets if missing
-if [[ ! -d srcs/secrets ]]; then
-	mkdir -p srcs/secrets
+if [[ ! -d "${SECRET_FOLDER}" ]]; then
+	mkdir -p "${SECRET_FOLDER}"
 fi
 
-if [[ ! -f srcs/secrets/db_password.txt ]]; then
-    echo "Generating DB password..."
-    openssl rand -base64 16 > srcs/secrets/db_password.txt
+if [[ ! -d "${SSL_FOLDER}" ]]; then
+	mkdir -p "${SSL_FOLDER}"
 fi
 
-if [[ ! -f srcs/secrets/db_admin_password.txt ]]; then
-    echo "Generating admin password..."
-    openssl rand -base64 16 > srcs/secrets/db_admin_password.txt
+if [[ ! -f ${PSW_FILE} ]]; then
+    echo "Enter passwrod, othewise generate"
+
+	read password
+	if [[ "$password" != "" ]]; then
+		echo "$password" > "${PSW_FILE}"
+	else
+		openssl rand -base64 16 > "${PSW_FILE}"	
+	fi
+fi
+
+if [[ ! -f "${PSW_ADMIN_FILE}" ]]; then
+	echo "Enter admin passwrod, othewise generate"
+
+	read admin_password
+	if [[ "$admin_password" != "" ]]; then
+		echo "$admin_password" > "${PSW_ADMIN_FILE}"
+	else
+		openssl rand -base64 16 > "${PSW_ADMIN_FILE}"	
+	fi
 fi
 
 # create certificates if missing
