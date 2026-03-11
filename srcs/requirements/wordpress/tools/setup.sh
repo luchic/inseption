@@ -22,7 +22,7 @@ if [[ ! -f /var/www/html/wp-config-sample.php ]]; then
 	mkdir -p /var/www/html
 	
 	
-	if ! wget https://wordpress.org/latest.tar.gz -P /tmp; then
+	if ! wget https://wordpress.org/latest.tar.gz -q -P /tmp; then
 		echo "Couldn't download wordpress files"
 		exit 1
 	fi

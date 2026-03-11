@@ -15,7 +15,6 @@ RUN apt-get update \
 COPY tools/setup.sh /setup.sh
 RUN chmod +x /setup.sh
 
-EXPOSE 80
 EXPOSE 9000
 
 ENTRYPOINT ["/setup.sh"]
