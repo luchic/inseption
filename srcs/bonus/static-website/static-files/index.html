@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inseption Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Hero -->
+    <header class="hero">
+        <nav>
+            <span class="logo">N.</span>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="hero-content">
+            <p class="hero-tag fade-in">Hello, I'm</p>
+            <h1 class="fade-in">A Developer</h1>
+            <p class="hero-sub fade-in">I build things for the web.</p>
+            <a href="#projects" class="btn fade-in">View My Work</a>
+        </div>
+    </header>
+
+    <!-- About -->
+    <section id="about" class="section">
+        <div class="container">
+            <h2 class="section-title fade-in">About Me</h2>
+            <div class="about-content fade-in">
+                <p>
+                    I'm a passionate developer who loves crafting clean, efficient, and
+                    user-friendly digital experiences. With a strong foundation in
+                    system administration and web technologies, I enjoy turning complex
+                    problems into simple, elegant solutions.
+                </p>
+                <div class="skills">
+                    <span class="chip">Docker</span>
+                    <span class="chip">Linux</span>
+                    <span class="chip">Nginx</span>
+                    <span class="chip">WordPress</span>
+                    <span class="chip">MariaDB</span>
+                    <span class="chip">C / C++</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title fade-in">Projects</h2>
+            <div class="project-grid">
+                <article class="card fade-in">
+                    <div class="card-number">01</div>
+                    <h3>Inseption</h3>
+                    <p>A fully containerised infrastructure using Docker Compose — Nginx, WordPress, MariaDB and more.</p>
+                    <span class="card-tag">Docker · DevOps</span>
+                </article>
+                <article class="card fade-in">
+                    <div class="card-number">02</div>
+                    <h3>Minishell</h3>
+                    <p>A minimal Unix shell written in C, handling pipes, redirections, built-ins and signal management.</p>
+                    <span class="card-tag">C · Systems</span>
+                </article>
+                <article class="card fade-in">
+                    <div class="card-number">03</div>
+                    <h3>ft_transcendence</h3>
+                    <p>A real-time multiplayer Pong web app with authentication, chat, and matchmaking.</p>
+                    <span class="card-tag">TypeScript · Web</span>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section">
+        <div class="container center">
+            <h2 class="section-title fade-in">Get in Touch</h2>
+            <p class="fade-in">Interested in working together? Drop me a line.</p>
+            <a href="mailto:example@example.com" class="btn fade-in">Say Hello</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Inseption. Built from scratch.</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
