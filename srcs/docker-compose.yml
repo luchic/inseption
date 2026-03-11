@@ -1,6 +1,14 @@
 name: test
 
 services:
+  redis:
+    build:
+      context: ./bonus/redis
+      dockerfile: Dockerfile
+    container_name: redis
+    networks:
+      - inseption
+
   nginx:
     build:
       context: ./requirements/nginx
