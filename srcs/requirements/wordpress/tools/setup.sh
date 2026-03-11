@@ -44,6 +44,9 @@ if [ ! -f wp-config.php ]; then
     sed -i "s/username_here/$DB_USER/" wp-config.php
     sed -i "s/password_here/$DB_PASSWORD/" wp-config.php
     sed -i "s/localhost/$DB_HOST/" wp-config.php
+
+	echo "define('WP_REDIS_HOST', 'redis');" >> wp-config.php
+	echo "define('WP_REDIS_PORT', 6379);" >> wp-config.php
 fi
 
 # chmod -R 777 /var/www/html | it need execute permisens or just chown
