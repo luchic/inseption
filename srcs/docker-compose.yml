@@ -1,6 +1,16 @@
 name: test
 
 services:
+  adminer:
+    build:
+      context: ./bonus/adminer
+      dockerfile: Dockerfile
+    container_name: adminer
+    networks:
+      - inseption
+    volumes:
+      - ./bonus/adminer/conf/www.conf:/etc/php/8.2/fpm/pool.d/www.conf
+
   redis:
     build:
       context: ./bonus/redis
@@ -8,6 +18,9 @@ services:
     container_name: redis
     networks:
       - inseption
+    volumes:
+      - ./bonus/redis/conf/redis.conf:/etc/redis/redis.conf
+      - redis-data:/data
 
   nginx:
     build:
@@ -44,6 +57,7 @@ services:
       - inseption
     depends_on:
       - mariadb
+      - redis
     volumes:
       - ./requirements/wordpress/conf/www.conf:/etc/php/8.2/fpm/pool.d/www.conf
       - web-data:/var/www/html
@@ -89,3 +103,4 @@ volumes:
       o: bind
       device: /home/nluchini/data/
   data-base:
+  redis-data:
