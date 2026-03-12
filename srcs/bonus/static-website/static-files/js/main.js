@@ -2,9 +2,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const marquee = document.querySelector('.marquee');
-	marquee.parentNode.appendChild(marquee.cloneNode(true));
-
 	/* ── Staggered fade-up on scroll ───────────────── */
     const faders = document.querySelectorAll('.fade-up');
 
