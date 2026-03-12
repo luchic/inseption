@@ -3,94 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inseption Portfolio</title>
+    <title>Inseption — Developer Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- Hero -->
-    <header class="hero">
-        <nav>
-            <span class="logo">N.</span>
-            <ul>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a href="#" class="logo">inseption<span>.</span></a>
+            <ul class="nav-links">
                 <li><a href="#about">About</a></li>
                 <li><a href="#projects">Projects</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#contact" class="nav-cta">Get in touch</a></li>
             </ul>
-        </nav>
-        <div class="hero-content">
-            <p class="hero-tag fade-in">Hello, I'm</p>
-            <h1 class="fade-in">A Developer</h1>
-            <p class="hero-sub fade-in">I build things for the web.</p>
-            <a href="#projects" class="btn fade-in">View My Work</a>
         </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+        <div class="hero-content">
+            <div class="hero-badge fade-up">👋 Available for new projects</div>
+            <h1 class="fade-up delay-1">
+                Code, create<br>
+                <span class="gradient-text">& ship things.</span>
+            </h1>
+            <p class="hero-sub fade-up delay-2">
+                I'm a developer who loves turning ideas into fast, beautiful,
+                and reliable software. From system-level code to full-stack web.
+            </p>
+            <div class="hero-actions fade-up delay-3">
+                <a href="#projects" class="btn btn-primary">See my work</a>
+                <a href="#contact" class="btn btn-ghost">Contact me</a>
+            </div>
+        </div>
+        <div class="hero-glow"></div>
     </header>
+
+    <!-- Marquee -->
+    <div class="marquee-wrap">
+        <div class="marquee">
+            <span>Docker</span><span>·</span>
+            <span>Nginx</span><span>·</span>
+            <span>WordPress</span><span>·</span>
+            <span>MariaDB</span><span>·</span>
+            <span>C / C++</span><span>·</span>
+            <span>TypeScript</span><span>·</span>
+            <span>Linux</span><span>·</span>
+            <span>Git</span><span>·</span>
+            <span>Docker</span><span>·</span>
+            <span>Nginx</span><span>·</span>
+            <span>WordPress</span><span>·</span>
+            <span>MariaDB</span><span>·</span>
+            <span>C / C++</span><span>·</span>
+            <span>TypeScript</span><span>·</span>
+            <span>Linux</span><span>·</span>
+            <span>Git</span><span>·</span>
+        </div>
+    </div>
 
     <!-- About -->
     <section id="about" class="section">
         <div class="container">
-            <h2 class="section-title fade-in">About Me</h2>
-            <div class="about-content fade-in">
-                <p>
-                    I'm a passionate developer who loves crafting clean, efficient, and
-                    user-friendly digital experiences. With a strong foundation in
-                    system administration and web technologies, I enjoy turning complex
-                    problems into simple, elegant solutions.
-                </p>
-                <div class="skills">
-                    <span class="chip">Docker</span>
-                    <span class="chip">Linux</span>
-                    <span class="chip">Nginx</span>
-                    <span class="chip">WordPress</span>
-                    <span class="chip">MariaDB</span>
-                    <span class="chip">C / C++</span>
+            <div class="section-label fade-up">About me</div>
+            <div class="about-grid">
+                <h2 class="big-heading fade-up">
+                    I build things that live on the internet — and some that live
+                    <span class="gradient-text">closer to the metal.</span>
+                </h2>
+                <div class="about-text fade-up">
+                    <p>
+                        With a background in systems programming and DevOps, I enjoy
+                        the full spectrum — from writing efficient C code to
+                        orchestrating containerised services with Docker and Nginx.
+                    </p>
+                    <p>
+                        I care about clean architecture, great developer experience,
+                        and software that just works.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Projects -->
-    <section id="projects" class="section section-alt">
+    <section id="projects" class="section section-dark">
         <div class="container">
-            <h2 class="section-title fade-in">Projects</h2>
+            <div class="section-label fade-up">Projects</div>
+            <h2 class="big-heading fade-up">
+                Things I've built<br>
+                <span class="gradient-text">and shipped.</span>
+            </h2>
+
             <div class="project-grid">
-                <article class="card fade-in">
-                    <div class="card-number">01</div>
+                <article class="project-card fade-up">
+                    <div class="card-icon">🐳</div>
                     <h3>Inseption</h3>
-                    <p>A fully containerised infrastructure using Docker Compose — Nginx, WordPress, MariaDB and more.</p>
-                    <span class="card-tag">Docker · DevOps</span>
+                    <p>A fully containerised infrastructure using Docker Compose — Nginx, WordPress, MariaDB, Redis, FTP, and a static site, all wired together.</p>
+                    <div class="card-pills">
+                        <span>Docker</span>
+                        <span>Nginx</span>
+                        <span>MariaDB</span>
+                    </div>
                 </article>
-                <article class="card fade-in">
-                    <div class="card-number">02</div>
+
+                <article class="project-card fade-up">
+                    <div class="card-icon">🐚</div>
                     <h3>Minishell</h3>
-                    <p>A minimal Unix shell written in C, handling pipes, redirections, built-ins and signal management.</p>
-                    <span class="card-tag">C · Systems</span>
+                    <p>A minimal Unix shell in C — pipes, redirections, heredocs, built-ins, and proper signal handling, all from scratch.</p>
+                    <div class="card-pills">
+                        <span>C</span>
+                        <span>Unix</span>
+                        <span>Processes</span>
+                    </div>
                 </article>
-                <article class="card fade-in">
-                    <div class="card-number">03</div>
+
+                <article class="project-card fade-up">
+                    <div class="card-icon">🏓</div>
                     <h3>ft_transcendence</h3>
-                    <p>A real-time multiplayer Pong web app with authentication, chat, and matchmaking.</p>
-                    <span class="card-tag">TypeScript · Web</span>
+                    <p>A real-time multiplayer Pong web app with OAuth, live chat, matchmaking, and a full REST API backend.</p>
+                    <div class="card-pills">
+                        <span>TypeScript</span>
+                        <span>WebSockets</span>
+                        <span>REST</span>
+                    </div>
                 </article>
             </div>
         </div>
     </section>
 
+    <!-- Skills -->
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="section-label fade-up">Toolbox</div>
+            <h2 class="big-heading fade-up">
+                Everyday <span class="gradient-text">superpowers.</span>
+            </h2>
+            <div class="skills-grid fade-up">
+                <div class="skill-item">
+                    <div class="skill-icon">⚙️</div>
+                    <h4>Systems</h4>
+                    <p>C, C++, Unix, Processes, Memory management</p>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🌐</div>
+                    <h4>Web</h4>
+                    <p>TypeScript, HTML, CSS, REST APIs, WebSockets</p>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🐳</div>
+                    <h4>DevOps</h4>
+                    <p>Docker, Docker Compose, Nginx, CI/CD, Linux</p>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-icon">🗄️</div>
+                    <h4>Data</h4>
+                    <p>MariaDB, Redis, SQL, Caching strategies</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact -->
-    <section id="contact" class="section">
-        <div class="container center">
-            <h2 class="section-title fade-in">Get in Touch</h2>
-            <p class="fade-in">Interested in working together? Drop me a line.</p>
-            <a href="mailto:example@example.com" class="btn fade-in">Say Hello</a>
+    <section id="contact" class="section section-dark">
+        <div class="container contact-container">
+            <div class="section-label fade-up">Contact</div>
+            <h2 class="big-heading fade-up">
+                Let's build something<br>
+                <span class="gradient-text">great together.</span>
+            </h2>
+            <p class="contact-sub fade-up">
+                Got a project in mind, a question, or just want to say hi?
+                I'd love to hear from you.
+            </p>
+            <a href="mailto:example@example.com" class="btn btn-primary btn-lg fade-up">
+                Say hello →
+            </a>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Inseption. Built from scratch.</p>
+    <footer class="footer">
+        <div class="footer-inner">
+            <span class="footer-logo">inseption<span>.</span></span>
+            <span class="footer-copy">&copy; 2025 · Built from scratch with 🤍</span>
+        </div>
     </footer>
 
     <script src="js/main.js"></script>
