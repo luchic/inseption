@@ -2,6 +2,36 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    const marquee = document.querySelector('.marquee');
+
+    const ensureMarqueeCoverage = () => {
+        if (!marquee || !marquee.parentElement) {
+            return;
+        }
+
+        const wrap = marquee.parentElement;
+
+        if (!marquee.dataset.baseContent) {
+            marquee.dataset.baseContent = marquee.innerHTML;
+        }
+
+        marquee.innerHTML = marquee.dataset.baseContent;
+
+        const minimumTrackWidth = wrap.clientWidth * 2;
+
+        while (marquee.scrollWidth < minimumTrackWidth) {
+            marquee.insertAdjacentHTML('beforeend', marquee.dataset.baseContent);
+        }
+    };
+
+    ensureMarqueeCoverage();
+    window.addEventListener('resize', ensureMarqueeCoverage, { passive: true });
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(ensureMarqueeCoverage);
+    }
+
+
 	/* ── Staggered fade-up on scroll ───────────────── */
     const faders = document.querySelectorAll('.fade-up');
 
