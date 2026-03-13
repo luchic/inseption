@@ -17,7 +17,6 @@ RUN chmod +x /setup.sh
 
 # Ngnix need permision to execute for folder
 # RUN chmod -R 777 /var/www/html
-RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 443
 

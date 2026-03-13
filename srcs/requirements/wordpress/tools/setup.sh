@@ -49,8 +49,10 @@ if [ ! -f wp-config.php ]; then
 	echo "define('WP_REDIS_PORT', 6379);" >> wp-config.php
 fi
 
-# chmod -R 777 /var/www/html | it need execute permisens or just chown
-chown -R www-data:www-data /var/www/html
+if [ ! -f /var/www/html/.initialized ]; then
+    chown -R www-data:www-data /var/www/html
+    touch /var/www/html/.initialized
+fi
 
 echo "Finished to setup wordpress"
 

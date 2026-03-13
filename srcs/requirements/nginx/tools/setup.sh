@@ -30,6 +30,8 @@ fi
 # NGNIX_CRT_FILE=/run/secrets/ngnix_crt
 # NGNIX_KEY_FILE=/run/secrets/ngnix_key
 
+# chown -R www-data:www-data /var/www/html
+
 echo "Starting ngninix ..."
 
 exec "$@"
