@@ -10,8 +10,6 @@ RUN mkdir -p /var/www/html/
 
 RUN wget https://www.adminer.org/latest.php -q -O /var/www/html/index.php
 
-RUN chown -R www-data:www-data /var/www/html
-
 EXPOSE 9000
 
 CMD ["php-fpm8.2", "-F"]
