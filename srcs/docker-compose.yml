@@ -1,6 +1,37 @@
 name: test
 
 services:
+  ftp-service:
+    build:
+      context: ./bonus/ftp
+      dockerfile: Dockerfile
+    container_name: ftp
+    networks:
+      - inseption
+    volumes:
+      - ./bonus/ftp/conf/vsftpd.conf:/etc/vsftpd.conf
+      - web-data:/var/www/html
+    ports:
+      - "4321:21"
+      - "60000-60005:60000-60005"
+    env_file:
+      - path: ./env/.env
+        required: true
+    secrets:
+      - ftp_password
+
+
+  my-syte:
+    build:
+      context: ./bonus/static-website
+      dockerfile: Dockerfile
+    container_name: my-syte
+    networks:
+      - inseption
+    volumes:
+      - ./bonus/static-website/conf/Caddyfile:/etc/caddy/Caddyfile
+      - ./bonus/static-website/static-files:/var/www/html
+
   adminer:
     build:
       context: ./bonus/adminer
@@ -94,6 +125,8 @@ secrets:
     file: ./secrets/ssl/nginx.crt
   ngnix_key:
     file: ./secrets/ssl/nginx.key
+  ftp_password:
+    file: ./secrets/ftp_passwor.txt
 
 volumes:
   web-data:
