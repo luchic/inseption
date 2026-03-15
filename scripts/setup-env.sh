@@ -75,6 +75,9 @@ DB_ADMIN_USER=$db_admin
 DB_ADMIN_PASSWORD_FILE=/run/secrets/db_admin_password
 
 DB_HOST=mariadb
+
+REDIS_HOST=redis
+REDIS_PORT=6379
 EOF
 
 fi
