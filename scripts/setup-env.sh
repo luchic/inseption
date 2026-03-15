@@ -37,57 +37,6 @@ generate_secret_password()
 	fi
 }
 
-get_web_data_dir_from_compose()
-{
-	if [[ ! -f "$COMPOSE_FILE" ]]; then
-		echo "$HOME/data"
-		return
-	fi
-
-	awk '
-		/^volumes:/ { in_volumes = 1 }
-		in_volumes && /^  web-data:/ { in_web_data = 1; next }
-		in_web_data && /^  [a-zA-Z0-9_-]+:/ && $1 != "web-data:" { in_web_data = 0 }
-		in_web_data && $1 == "device:" { print $2; exit }
-	' "$COMPOSE_FILE"
-}
-
-generate_wordpress_salts()
-{
-	if [[ ! -f "$WP_CONFIG_SAMPLE" ]]; then
-		return
-	fi
-
-	if ! grep -q "put your unique phrase here" "$WP_CONFIG_SAMPLE"; then
-		return
-	fi
-
-	echo "Generating WordPress salts..."
-
-	local tmp_file
-	tmp_file=$(mktemp)
-
-	local -a salts=()
-	local i
-	for i in {1..8}; do
-		salts+=("$(openssl rand -hex 32)")
-	done
-
-	local salt_index=0
-	while IFS= read -r line || [[ -n "$line" ]]; do
-		if [[ "$line" == *"put your unique phrase here"* && $salt_index -lt 8 ]]; then
-			line="${line/put your unique phrase here/${salts[$salt_index]}}"
-			((salt_index += 1))
-		fi
-		printf '%s\n' "$line" >> "$tmp_file"
-	done < "$WP_CONFIG_SAMPLE"
-
-	mv "$tmp_file" "$WP_CONFIG_SAMPLE"
-}
-
-# maybe I can use set -e for exit on error, but I'm not sure.
-#set -e
-
 echo "Setting up environment..."
 
 
