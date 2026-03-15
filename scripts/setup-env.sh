@@ -1,9 +1,10 @@
 #!/bin/bash
 # version 0.1
 
+set -euo pipefail
+
 SECRET_FOLDER="srcs/secrets"
 PSW_FILE="${SECRET_FOLDER}/db_password.txt"
-ADMIN_NAME_FILE="${SECRET_FOLDER}/db_admin_user.txt"
 PSW_ADMIN_FILE="${SECRET_FOLDER}/db_admin_password.txt"
 
 SSL_FOLDER="${SECRET_FOLDER}/ssl"
@@ -20,7 +21,7 @@ generate_secret_password()
 	local message=$2
 
 	if [[ ! -f "$file" ]]; then
-		read -s -p "$message" password
+		read -r -s -p "$message" password
 		echo
 		if [[ -n "$password" ]]; then
 			echo "$password" > "$file"
@@ -45,16 +46,16 @@ if [[ ! -d "$SSL_FOLDER" ]]; then
 fi
 
 
-read -p "Enter database name (default: wordpress): " db_name
+read -r -p "Enter database name (default: wordpress): " db_name
 db_name=${db_name:-wordpress}
 
-read -p "Enter database user (default: wordpress): " db_user
+read -r -p "Enter database user (default: wordpress): " db_user
 db_user=${db_user:-wordpress}
 
 generate_secret_password "$PSW_FILE" \
 			s"Enter password (leave empty to generate): "
 
-read -p "Enter admin user (default: admin): " db_admin
+read -r -p "Enter admin user (default: admin): " db_admin
 db_admin=${db_admin:-admin}
 
 generate_secret_password "$PSW_ADMIN_FILE" \
