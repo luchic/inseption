@@ -38,6 +38,12 @@ make setup
 
 This runs `scripts/setup-env.sh`.
 
+The script also asks your login, creates `/home/<login>/data/`, and updates
+`srcs/docker-compose.yml` for `volumes -> web-data -> device`.
+
+If you do not use the script, you must set this path manually in
+`srcs/docker-compose.yml` to match your host.
+
 ### Start (build & run)
 
 ```bash

@@ -63,6 +63,9 @@ The script asks for values and creates missing files in `srcs/env/` and
 `srcs/secrets/` (including TLS files in `srcs/secrets/ssl/`). It only creates
 files if they do not already exist.
 
+It also asks for your login, creates `/home/<login>/data/`, and updates
+`srcs/docker-compose.yml` (`volumes -> web-data -> device`) to that path.
+
 ### 3.3 Create the `.env` File (manual)
 
 Docker Compose expects an environment file at `srcs/env/.env`. Create it with the
@@ -130,11 +133,11 @@ for `localhost` and `127.0.0.1`.
 The `web-data` volume is bind-mounted from the host:
 
 ```bash
-mkdir -p /home/nluchini/data/
+mkdir -p /home/<your-login>/data/
 ```
 
-> This path is hard-coded in `docker-compose.yml` under `volumes → web-data →
-> device`. Change it if you are working on a different machine.
+> This path is set in `srcs/docker-compose.yml` under `volumes -> web-data ->
+> device`. It must match your local machine path.
 
 ---
 
