@@ -141,6 +141,6 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/nluchini/data/
+      device: /home/login/data/
   data-base:
   redis-data:
