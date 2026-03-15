@@ -6,6 +6,7 @@ services:
       context: ./bonus/ftp
       dockerfile: Dockerfile
     container_name: ftp
+    restart: on-failure:5
     networks:
       - inseption
     volumes:
@@ -26,6 +27,7 @@ services:
       context: ./bonus/static-website
       dockerfile: Dockerfile
     container_name: my-syte
+    restart: on-failure:5
     networks:
       - inseption
     volumes:
@@ -37,6 +39,7 @@ services:
       context: ./bonus/adminer
       dockerfile: Dockerfile
     container_name: adminer
+    restart: on-failure:5    
     networks:
       - inseption
     volumes:
@@ -47,6 +50,7 @@ services:
       context: ./bonus/redis
       dockerfile: Dockerfile
     container_name: redis
+    restart: on-failure:5 
     networks:
       - inseption
     volumes:
@@ -63,6 +67,7 @@ services:
         required: true
     ports:
       - "8443:443"
+    restart: on-failure:5
     networks:
       - inseption
     depends_on:
@@ -84,6 +89,7 @@ services:
         required: true
     secrets:
       - db_password
+    restart: on-failure:5
     networks:
       - inseption
     depends_on:
@@ -105,6 +111,7 @@ services:
     secrets:
       - db_password
       - db_admin_password
+    restart: on-failure:5
     networks:
       - inseption
     volumes:
