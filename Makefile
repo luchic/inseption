@@ -17,6 +17,6 @@ re:
 	make up
 
 setup:
-	./scripts/setup-env.sh
+	bash ./scripts/setup-env.sh
 
 .PHONY: re clean fclean down up setup
