@@ -46,7 +46,24 @@ git clone <repository-url> inseption
 cd inseption
 ```
 
-### 3.2 Create the `.env` File
+### 3.2 Quick Setup Script (recommended)
+
+You can setup the environment with:
+
+```bash
+./scripts/setup-env.sh
+```
+or
+```bash
+make setup
+```
+
+
+The script asks for values and creates missing files in `srcs/env/` and
+`srcs/secrets/` (including TLS files in `srcs/secrets/ssl/`). It only creates
+files if they do not already exist.
+
+### 3.3 Create the `.env` File (manual)
 
 Docker Compose expects an environment file at `srcs/env/.env`. Create it with the
 variables referenced by the containers:
@@ -79,7 +96,7 @@ REDIS_PORT=6379
 EOF
 ```
 
-### 3.3 Populate Secrets
+### 3.4 Populate Secrets
 
 Edit each file under `srcs/secrets/` with the desired values:
 
@@ -89,7 +106,7 @@ echo "YourAdminPassword"   > srcs/secrets/db_admin_password.txt
 echo "YourFtpPassword"     > srcs/secrets/ftp_passwor.txt
 ```
 
-### 3.4 Generate TLS Certificates (optional — already included)
+### 3.5 Generate TLS Certificates (optional — already included)
 
 If you need to regenerate the self-signed certificate:
 
@@ -108,7 +125,7 @@ cd ../../..
 The OpenSSL config sets `CN = nluchini.42.fr` with Subject Alternative Names
 for `localhost` and `127.0.0.1`.
 
-### 3.5 Create the Host Data Directory
+### 3.6 Create the Host Data Directory
 
 The `web-data` volume is bind-mounted from the host:
 
