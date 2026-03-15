@@ -1,4 +1,5 @@
 #!/bin/bash
+# version 0.1
 
 SECRET_FOLDER="srcs/secrets"
 PSW_FILE="${SECRET_FOLDER}/db_password.txt"
