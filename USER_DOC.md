@@ -28,6 +28,16 @@ Browser ──HTTPS:8443──▶ NGINX ──FastCGI:9000──▶ WordPress (P
 All commands are run from the **project root** directory
 (`/home/nluchini/core/projects/inseption`).
 
+### Optional: automatic environment setup
+
+Before first start, you can generate `.env`, secrets, and TLS files with:
+
+```bash
+make setup
+```
+
+This runs `scripts/setup-env.sh`.
+
 ### Start (build & run)
 
 ```bash
@@ -37,9 +47,6 @@ make up
 This builds every Docker image (if needed) and starts all containers in the
 foreground. Add `-d` manually if you want to run in detached mode:
 
-```bash
-docker compose up --build -d
-```
 
 ### Stop
 
@@ -56,8 +63,16 @@ is safe).
 make clean
 ```
 
-> ⚠️ **Warning** — This removes all Docker volumes, meaning your database and
-> uploaded WordPress files will be **permanently deleted**.
+Removes containers/networks/images, but keeps volumes.
+
+To also remove volumes:
+
+```bash
+make fclean
+```
+
+> ⚠️ **Warning** — `make fclean` removes Docker volumes, meaning your database
+> data will be **permanently deleted**.
 
 ### Rebuild from Scratch
 
@@ -109,8 +124,8 @@ directory:
 | File                              | Purpose                                          |
 |-----------------------------------|--------------------------------------------------|
 | `secrets/db_password.txt`         | Password for the WordPress database user         |
-| `secrets/db_admin_user.txt`       | Username of the MariaDB admin account            |
 | `secrets/db_admin_password.txt`   | Password of the MariaDB admin account            |
+| `secrets/ftp_passwor.txt`         | Password for the FTP user                        |
 | `secrets/ssl/nginx.crt`          | TLS certificate used by NGINX                    |
 | `secrets/ssl/nginx.key`          | TLS private key used by NGINX                    |
 
@@ -121,16 +136,6 @@ directory:
 | WordPress DB user| `wordpress`   | `secrets/db_password.txt`      | `wordpress` database   |
 | MariaDB admin    | *(see file)*  | `secrets/db_admin_password.txt`| All databases          |
 
-### Changing a Credential
-
-1. Edit the corresponding file inside `srcs/secrets/`.
-2. If you change the database password, also update `srcs/web/wp-config.php`
-   (the `DB_PASSWORD` constant) so WordPress can still connect.
-3. Restart the stack:
-   ```bash
-   make re
-   ```
-
 ---
 
 ## 5. Checking That Services Are Running
@@ -140,9 +145,6 @@ directory:
 ```bash
 docker compose ps
 ```
-
-You should see three containers: `ngnix`, `wordpress`, and `mariadb`, all with
-a status of **Up**.
 
 ### View Logs
 
