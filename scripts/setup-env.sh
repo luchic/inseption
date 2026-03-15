@@ -1,5 +1,5 @@
 #!/bin/bash
-# version 0.1
+# version 0.2
 
 set -euo pipefail
 
@@ -19,6 +19,7 @@ SSL_CONFIG="$SCRIPT_DIR/openssl-certificate-generation.conf"
 
 ENV_FOLDER="$SRCS_FOLDER/env"
 ENV_FILE="$ENV_FOLDER/.env"
+COMPOSE_FILE="$SRCS_FOLDER/docker-compose.yml"
 
 generate_secret_password()
 {
@@ -40,6 +41,12 @@ generate_secret_password()
 echo "Setting up environment..."
 
 
+if [[ ! -f "$COMPOSE_FILE" ]]; then
+	echo "Missing docker compose file: $COMPOSE_FILE"
+	exit 1
+fi
+
+
 if [[ ! -f "$SSL_CONFIG" ]]; then
 	echo "Missing SSL config file: $SSL_CONFIG"
 	exit 1
@@ -56,6 +63,18 @@ fi
 if [[ ! -d "$ENV_FOLDER" ]]; then
 	mkdir -p "$ENV_FOLDER"
 fi
+
+default_login=$(id -un)
+read -r -p "Enter your login, that will be used for web-data (default: $default_login): " host_login
+host_login=${host_login:-$default_login}
+
+HOST_DATA_PATH="/home/$host_login/data/"
+
+mkdir -p "$HOST_DATA_PATH"
+
+sed -i -E "s|(^[[:space:]]*device:[[:space:]]*)/home/[^/]+/data/|\\1$HOST_DATA_PATH|" "$COMPOSE_FILE"
+
+echo "web-data path set to: $HOST_DATA_PATH"
 
 
 read -r -p "Enter database name (default: wordpress): " db_name
