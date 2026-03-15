@@ -10,53 +10,29 @@
 | **OpenSSL**        | 1.1+            | Only needed if you regenerate TLS certificates|
 | **Git**            | any             | To clone the repository                       |
 
-Verify your installation:
-
-```bash
-docker --version
-docker compose version
-make --version
-```
-
 ---
 
 ## 2. Repository Structure
 
 ```
 inseption/
-├── Makefile                          # Top-level build/run shortcuts
-├── USER_DOC.md                       # End-user documentation
-├── DEV_DOC.md                        # This file
-├── srcs/
-│   ├── docker-compose.yml            # Orchestration for all services
-│   ├── .env                          # Environment variables (create manually)
-│   ├── secrets/                      # Docker secrets (passwords, TLS certs)
-│   │   ├── db_password.txt
-│   │   ├── db_admin_user.txt
-│   │   ├── db_admin_password.txt
-│   │   └── ssl/
-│   │       ├── nginx.crt
-│   │       ├── nginx.key
-│   │       └── openssl-certificate-generation.conf
-│   ├── requirements/
-│   │   ├── nginx/
-│   │   │   ├── Dockerfile
-│   │   │   ├── conf/defualt.conf     # NGINX virtual-host config
-│   │   │   └── tools/setup.sh        # Entrypoint: copies TLS certs
-│   │   ├── wordpress/
-│   │   │   ├── Dockerfile
-│   │   │   ├── conf/www.conf         # PHP-FPM pool configuration
-│   │   │   └── tools/setup.sh        # Entrypoint: downloads WP, configures DB
-│   │   └── mariadb/
-│   │       ├── Dockerfile
-│   │       ├── conf/server.cnf       # MariaDB server configuration
-│   │       └── tools/setup.sh        # Entrypoint: creates DB & users
-│   └── web/                          # WordPress source files (populated at build)
-│       ├── wp-config.php
-│       └── ...
-└── test/
-    ├── Dockerfile
-    └── Makefile
+├── DEV_DOC.md
+├── Makefile
+├── USER_DOC.md
+├── scripts/ 				# Settuping script
+└── srcs/
+    ├── docker-compose.yml
+    ├── env/
+    ├── secrets/
+    ├── requirements/
+    │   ├── mariadb/
+    │   ├── nginx/
+    │   └── wordpress/
+    └── bonus/
+        ├── adminer/
+        ├── ftp/
+        ├── redis/
+        └── static-website/ #Service with my static web site
 ```
 
 ---
