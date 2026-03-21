@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL "https://dl.grafana.com/oss/release/grafana-${GRAFANA_VERSION}.linux-amd64.tar.gz" \
     -o /tmp/grafana.tar.gz \
     && tar -xzf /tmp/grafana.tar.gz -C /opt/ \
-    && mv /opt/grafana-${GRAFANA_VERSION} /opt/grafana \
+    && mv /opt/grafana-v${GRAFANA_VERSION} /opt/grafana \
     && rm /tmp/grafana.tar.gz
 
 RUN useradd -r -s /bin/false grafana \
