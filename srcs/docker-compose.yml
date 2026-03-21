@@ -3,7 +3,9 @@ name: test
 services:
   portainer:
     container_name: portainer
-    image: portainer/portainer-ce:sts
+    build:
+      context: ./bonus/portainer
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
