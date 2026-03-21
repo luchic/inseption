@@ -1,24 +1,24 @@
-FROM debian:bookworm-slim
-
-ARG LOKI_VERSION=3.4.2
+FROM debian:12
 
 RUN apt-get update && apt-get install -y \
-    curl \
-    unzip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    apt-transport-https \
+    software-properties-common \
+    wget \
+    gpg
 
-RUN curl -fsSL "https://github.com/grafana/loki/releases/download/v${LOKI_VERSION}/promtail-linux-amd64.zip" \
-    -o /tmp/promtail.zip \
-    && unzip /tmp/promtail.zip -d /tmp/ \
-    && mv /tmp/promtail-linux-amd64 /usr/local/bin/promtail \
-    && chmod +x /usr/local/bin/promtail \
-    && rm /tmp/promtail.zip
 
-RUN mkdir -p /etc/promtail /var/lib/promtail
+RUN mkdir -p /etc/apt/keyrings && \
+    wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor > /etc/apt/keyrings/grafana.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" \
+    > /etc/apt/sources.list.d/grafana.list
 
-COPY promtail-config.yaml /etc/promtail/promtail-config.yaml
+
+RUN apt-get update && apt-get install -y promtail && apt-get clean
+
+RUN mkdir -p /conf
+
+COPY promtail-config.yaml /conf/promtail-config.yaml
 
 EXPOSE 9080
 
-CMD ["promtail", "-config.file=/etc/promtail/promtail-config.yaml"]
+CMD ["promtail", "-config.file=/conf/promtail-config.yaml"]
