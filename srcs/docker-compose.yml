@@ -2,7 +2,9 @@ name: test
 
 services:
   loki:
-    build: ./requirements/bonus/loki
+    build:
+      context: ./bonus/loki
+      dockerfile: Dockerfile
     container_name: loki
     volumes:
       - loki-data:/loki
@@ -11,7 +13,9 @@ services:
     restart: unless-stopped
 
   dozzle:
-    build: ./requirements/bonus/dozzle
+    build:
+      context: ./bonus/dozzle
+      dockerfile: Dockerfile
     container_name: dozzle
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
