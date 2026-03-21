@@ -1,14 +1,16 @@
 FROM debian:bookworm-slim
 
-ARG DOZZLE_VERSION=8.11.5
-
 RUN apt-get update && apt-get install -y \
     curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL "https://github.com/amir20/dozzle/releases/download/v${DOZZLE_VERSION}/dozzle_Linux_amd64.tar.gz" \
-    -o /tmp/dozzle.tar.gz \
+# Use GitHub API to download the latest release binary
+RUN DOZZLE_VERSION=$(curl -s https://api.github.com/repos/amir20/dozzle/releases/latest \
+        | grep '"tag_name"' \
+        | cut -d'"' -f4) \
+    && curl -fsSL "https://github.com/amir20/dozzle/releases/download/${DOZZLE_VERSION}/dozzle_Linux_amd64.tar.gz" \
+        -o /tmp/dozzle.tar.gz \
     && tar -xzf /tmp/dozzle.tar.gz -C /usr/local/bin/ dozzle \
     && chmod +x /usr/local/bin/dozzle \
     && rm /tmp/dozzle.tar.gz \
