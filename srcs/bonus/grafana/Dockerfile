@@ -1,28 +1,19 @@
-FROM debian:bookworm-slim
+FROM debian:12
 
-ARG GRAFANA_VERSION=11.4.0
+RUN apt-get update && apt-get install -y apt-transport-https wget gnupg
 
-RUN apt-get update && apt-get install -y \
-    curl \
-    libfontconfig1 \
-    musl \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /etc/apt/keyrings \
+	&& wget -O /etc/apt/keyrings/grafana.asc https://apt.grafana.com/gpg-full.key \
+ 	&& chmod 644 /etc/apt/keyrings/grafana.asc
 
-RUN curl -fsSL "https://dl.grafana.com/oss/release/grafana-${GRAFANA_VERSION}.linux-amd64.tar.gz" \
-    -o /tmp/grafana.tar.gz \
-    && tar -xzf /tmp/grafana.tar.gz -C /opt/ \
-    && mv /opt/grafana-v${GRAFANA_VERSION} /opt/grafana \
-    && rm /tmp/grafana.tar.gz
+RUN echo "deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main" \
+	| tee -a /etc/apt/sources.list.d/grafana.list
 
-RUN useradd -r -s /bin/false grafana \
-    && mkdir -p /var/lib/grafana \
-    && chown -R grafana:grafana /opt/grafana /var/lib/grafana
+RUN apt-get update && apt-get install -y grafana
 
-USER grafana
 
 EXPOSE 3000
 
-CMD ["/opt/grafana/bin/grafana", "server", \
-    "--config=/opt/grafana/conf/defaults.ini", \
-    "--homepath=/opt/grafana"]
+CMD ["/usr/share/grafana/bin/grafana", "server", \
+    "--config=/etc/grafana/grafana.ini", \
+    "--homepath=/usr/share/grafana"]
