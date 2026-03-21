@@ -31,6 +31,7 @@ services:
       dockerfile: Dockerfile
     container_name: grafana
     volumes:
+      - ./bonus/grafana/grafana.ini:/etc/grafana/grafana.ini
       - grafana-data:/var/lib/grafana
     restart: unless-stopped
     depends_on:
