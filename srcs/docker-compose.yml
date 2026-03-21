@@ -8,21 +8,37 @@ services:
     container_name: loki
     volumes:
       - loki-data:/loki
-    ports:
-      - "3100:3100"
     restart: unless-stopped
-
-  dozzle:
+    networks:
+      - inseption
+  
+  promtail:
     build:
-      context: ./bonus/dozzle
+      context: ./bonus/promtail
       dockerfile: Dockerfile
-    container_name: dozzle
+    container_name: promtail
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - "8080:8080"
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
     restart: unless-stopped
-
+    depends_on:
+      - loki
+    networks:
+      - inseption
+  
+  grafana:
+    build:
+      context: ./bonus/grafana
+      dockerfile: Dockerfile
+    container_name: grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - loki
+    networks:
+      - inseption
 
   ftp-service:
     build:
@@ -173,3 +189,5 @@ volumes:
     name: portainer_data
   loki-data:
     name: loki-data  
+  grafana-data:
+    name: grafana-data
