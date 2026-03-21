@@ -167,3 +167,5 @@ volumes:
     name: redis-data
   portainer_data:
     name: portainer_data
+  loki-data:
+    name: loki-data  
