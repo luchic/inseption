@@ -2,35 +2,50 @@
 
 ## 1. Overview
 
-Inception is a self-hosted web infrastructure stack built with **Docker**. It provides
-the following services:
+This project is a self-hosted Docker stack built around WordPress.
 
-| Service       | Role                                                                 |
-|---------------|----------------------------------------------------------------------|
-| **NGINX**     | Reverse-proxy and TLS termination (HTTPS on port **8443**)          |
-| **WordPress** | Content-management system served via PHP-FPM on port 9000           |
-| **MariaDB**   | Relational database that stores all WordPress data                  |
+Core services:
 
-All three services run as isolated Docker containers on a private bridge network
-called `inception `. Only the NGINX container exposes a port to the host.
+| Service       | Role                                                        |
+|---------------|-------------------------------------------------------------|
+| **NGINX**     | Reverse proxy and TLS termination on host port **8443**     |
+| **WordPress** | PHP-FPM application server for the WordPress site           |
+| **MariaDB**   | Database used by WordPress                                  |
 
-```
-Browser ──HTTPS:8443──▶ NGINX ──FastCGI:9000──▶ WordPress (PHP-FPM)
-                                                       │
-                                                       ▼
-                                                   MariaDB :3306
-```
+Bonus services currently enabled in the setup:
+
+| Service        | Role                                                |
+|----------------|-----------------------------------------------------|
+| **Redis**      | Object cache backend for WordPress                  |
+| **FTP**        | FTP access to the shared web files                  |
+| **Adminer**    | Database administration UI inside the Docker network|
+| **Static site**| Caddy-based static website container                |
+| **Loki**       | Log aggregation backend                             |
+| **Promtail**   | Log shipper for container logs                      |
+| **Grafana**    | Metrics and log visualization                       |
+
+Only the following ports are published to the host by default:
+
+| Service | Host Port | Container Port |
+|---------|-----------|----------------|
+| NGINX   | 8443      | 443            |
+| FTP     | 4321      | 21             |
+| FTP     | 60000-60005 | 60000-60005  |
+
+The containers are attached to the Compose bridge network keyed as `inception`.
+With the current Compose project name (`name: test`), Docker will create
+runtime network names based on that project, for example `test_inception`.
 
 ---
 
 ## 2. Starting and Stopping the Project
 
-All commands are run from the **project root** directory
-(`/home/nluchini/core/projects/inception `).
+Run commands from the project root:
+`/home/nluchini/core/projects/inseption`
 
 ### Optional: automatic environment setup
 
-Before first start, you can generate `.env`, secrets, and TLS files with:
+Before the first start, you can generate `.env`, secrets, and TLS files with:
 
 ```bash
 make setup
@@ -38,21 +53,25 @@ make setup
 
 This runs `scripts/setup-env.sh`.
 
-The script also asks your login, creates `/home/<login>/data/`, and updates
-`srcs/docker-compose.yml` for `volumes -> web-data -> device`.
+The script:
 
-If you do not use the script, you must set this path manually in
-`srcs/docker-compose.yml` to match your host.
+- asks for your login and updates the `web-data` bind mount path
+- creates `/home/<login>/data/`
+- creates missing files in `srcs/env/` and `srcs/secrets/`
+- generates passwords only when the secret files do not already exist
+- generates TLS files only when they do not already exist
 
-### Start (build & run)
+If you do not use the script, you must set the `web-data` bind-mount path
+manually in `srcs/docker-compose.yml`.
+
+### Start
 
 ```bash
 make up
 ```
 
-This builds every Docker image (if needed) and starts all containers in the
-foreground. Add `-d` manually if you want to run in detached mode:
-
+This runs `docker compose -f srcs/docker-compose.yml up`, which builds images if
+needed and starts the stack in the foreground.
 
 ### Stop
 
@@ -60,27 +79,29 @@ foreground. Add `-d` manually if you want to run in detached mode:
 make down
 ```
 
-Stops and removes the running containers, but **preserves** volumes (your data
-is safe).
+This stops and removes the running containers while preserving volumes.
 
-### Full Clean (stop + delete volumes)
+### Clean containers and images
 
 ```bash
 make clean
 ```
 
-Removes containers/networks/images, but keeps volumes.
+This runs `docker compose -f srcs/docker-compose.yml down --rmi all`.
+Containers, networks, and images are removed, but volumes are kept.
 
-To also remove volumes:
+### Remove volumes too
 
 ```bash
 make fclean
 ```
 
-> ⚠️ **Warning** — `make fclean` removes Docker volumes, meaning your database
-> data will be **permanently deleted**.
+This also removes Docker volumes created by Compose.
 
-### Rebuild from Scratch
+`web-data` is a host bind mount, so files under `/home/<login>/data/` are not
+deleted by `make fclean`.
+
+### Rebuild from scratch
 
 ```bash
 make re
@@ -90,98 +111,123 @@ Equivalent to `make clean` followed by `make up`.
 
 ---
 
-## 3. Accessing the Website
+## 3. Accessing the Services
 
-### WordPress Front-End
+### WordPress front-end
 
-Open your browser and navigate to:
+Open:
 
-```
+```text
 https://localhost:8443
 ```
 
-> Because the certificate is self-signed your browser will show a security
-> warning. Click **Advanced → Proceed** (or **Accept the Risk**) to continue.
+If you configure local DNS or `/etc/hosts`, you can also use the hostname
+present in your certificate.
 
-If DNS is configured (e.g. in `/etc/hosts`), you can also use:
+### WordPress admin panel
 
-```
-https://nluchini.42.fr:8443
-```
-
-### WordPress Administration Panel
-
-```
+```text
 https://localhost:8443/wp-admin
 ```
 
-Log in with the WordPress admin credentials you configured during the initial
-WordPress setup wizard (or that were pre-configured in `wp-config.php`).
+The database connection is configured automatically by the container setup, but
+the WordPress administrator account is created through the WordPress web
+installer on first launch.
+
+### FTP
+
+Connect to:
+
+```text
+Host: localhost
+Port: 4321
+Passive ports: 60000-60005
+Username: value of FTP_USER in srcs/env/.env
+Password: value stored in srcs/secrets/ftp_passwor.txt
+```
+
+### Browser certificate warning
+
+The TLS certificate is self-signed, so your browser will show a warning. Accept
+it to continue.
 
 ---
 
-## 4. Credentials
+## 4. Credentials and Configuration Files
 
-### Where Credentials Are Stored
+### Secret files
 
-All sensitive values are stored as **Docker secrets** inside the `srcs/secrets/`
-directory:
+Sensitive values are stored under `srcs/secrets/`:
 
-| File                              | Purpose                                          |
-|-----------------------------------|--------------------------------------------------|
-| `secrets/db_password.txt`         | Password for the WordPress database user         |
-| `secrets/db_admin_password.txt`   | Password of the MariaDB admin account            |
-| `secrets/ftp_passwor.txt`         | Password for the FTP user                        |
-| `secrets/ssl/nginx.crt`          | TLS certificate used by NGINX                    |
-| `secrets/ssl/nginx.key`          | TLS private key used by NGINX                    |
+| File                                | Purpose                                |
+|-------------------------------------|----------------------------------------|
+| `srcs/secrets/db_password.txt`      | WordPress database user password       |
+| `srcs/secrets/db_admin_password.txt`| MariaDB admin password                 |
+| `srcs/secrets/ftp_passwor.txt`      | FTP user password                      |
+| `srcs/secrets/ssl/nginx.crt`        | TLS certificate for NGINX              |
+| `srcs/secrets/ssl/nginx.key`        | TLS private key for NGINX              |
 
-### Default Database Accounts
+Note: `ftp_passwor.txt` is the current filename used by the repo.
 
-| Account          | Username      | Password file                  | Scope                  |
-|------------------|---------------|--------------------------------|------------------------|
-| WordPress DB user| `wordpress`   | `secrets/db_password.txt`      | `wordpress` database   |
-| MariaDB admin    | *(see file)*  | `secrets/db_admin_password.txt`| All databases          |
+### Environment file
+
+Non-secret settings are stored in:
+
+```text
+srcs/env/.env
+```
+
+Important values include:
+
+- `DB_NAME`
+- `DB_USER`
+- `DB_ADMIN_USER`
+- `FTP_USER`
+- `DB_HOST`
+- `REDIS_HOST`
+- `REDIS_PORT`
+
+### Default accounts
+
+| Account            | Username source          | Password source                        |
+|--------------------|--------------------------|----------------------------------------|
+| WordPress DB user  | `DB_USER` in `.env`      | `srcs/secrets/db_password.txt`         |
+| MariaDB admin user | `DB_ADMIN_USER` in `.env`| `srcs/secrets/db_admin_password.txt`   |
+| FTP user           | `FTP_USER` in `.env`     | `srcs/secrets/ftp_passwor.txt`         |
 
 ---
 
 ## 5. Checking That Services Are Running
 
-### List Running Containers
+From the project root, use:
 
 ```bash
-docker compose ps
+docker compose -f srcs/docker-compose.yml ps
 ```
 
-### View Logs
+### View logs
 
 ```bash
-# All services
-docker compose logs
-
-# A single service (e.g. nginx)
-docker compose logs nginx
-
-# Follow logs in real time
-docker compose logs -f
+docker compose -f srcs/docker-compose.yml logs
+docker compose -f srcs/docker-compose.yml logs nginx
+docker compose -f srcs/docker-compose.yml logs -f
 ```
 
-### Quick Health Checks
+### Quick health checks
 
-| Check                        | Command                                                                                      |
-|------------------------------|----------------------------------------------------------------------------------------------|
-| NGINX responds on 8443       | `curl -k https://localhost:8443`                                                             |
-| WordPress PHP is processing  | `curl -k https://localhost:8443/wp-login.php` (should return the login page HTML)            |
-| MariaDB is accepting connections | `docker exec mariadb mysqladmin ping`                                                    |
-| Database exists              | `docker exec mariadb mysql -u wordpress -pHello12345 -e "SHOW DATABASES;"`                   |
+| Check                    | Command |
+|--------------------------|---------|
+| NGINX responds on 8443   | `curl -k https://localhost:8443` |
+| WordPress login page     | `curl -k https://localhost:8443/wp-login.php` |
+| MariaDB accepts requests | `docker exec mariadb mysqladmin ping` |
+| Compose services status  | `docker compose -f srcs/docker-compose.yml ps` |
 
-> Replace the password above with the actual value from `secrets/db_password.txt`
-> if you changed it.
+### Common issues
 
-### Common Issues
-
-| Symptom                                | Likely Cause                                  | Fix                                            |
-|----------------------------------------|-----------------------------------------------|-------------------------------------------------|
-| Browser says "connection refused"      | Containers are not running                    | Run `make up`                                  |
-| "502 Bad Gateway" from NGINX           | WordPress/PHP-FPM has not finished starting   | Wait a few seconds and refresh                 |
-| "Access denied" in MariaDB logs        | Password mismatch between secret and wp-config| Sync `db_password.txt` with `wp-config.php`    |
-| Certificate warning in browser         | Self-signed certificate                       | Expected — accept and proceed                  |
+| Symptom                           | Likely cause                                  | Fix |
+|-----------------------------------|-----------------------------------------------|-----|
+| `docker compose` cannot find file | Command run from root without `-f srcs/docker-compose.yml` | Use the Makefile or add `-f srcs/docker-compose.yml` |
+| Browser says connection refused   | Containers are not running                    | Run `make up` |
+| NGINX returns an upstream error   | WordPress or PHP-FPM is still starting        | Wait a few seconds and refresh |
+| WordPress cannot connect to DB    | Secret and `.env` values do not match service setup | Re-run `make setup` or verify `srcs/env/.env` and `srcs/secrets/` |
+| Certificate warning in browser    | Self-signed certificate                       | Expected behavior |

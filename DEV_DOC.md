@@ -2,24 +2,26 @@
 
 ## 1. Prerequisites
 
-| Requirement        | Minimum Version | Notes                                         |
-|--------------------|-----------------|-----------------------------------------------|
-| **Docker Engine**  | 20.10+          | Must support Compose V2 (`docker compose`)    |
-| **Docker Compose** | 2.x             | Integrated into Docker CLI as a plugin        |
-| **GNU Make**       | 3.81+           | Used to wrap common Docker Compose commands   |
-| **OpenSSL**        | 1.1+            | Only needed if you regenerate TLS certificates|
-| **Git**            | any             | To clone the repository                       |
+| Requirement        | Minimum Version | Notes                                      |
+|--------------------|-----------------|--------------------------------------------|
+| **Docker Engine**  | 20.10+          | Must support Compose V2                    |
+| **Docker Compose** | 2.x             | Available as `docker compose`              |
+| **GNU Make**       | 3.81+           | Used for project shortcuts                 |
+| **OpenSSL**        | 1.1+            | Used by `scripts/setup-env.sh`             |
+| **Git**            | any             | To clone the repository                    |
 
 ---
 
 ## 2. Repository Structure
 
-```
-inception /
+```text
+inseption/
 ├── DEV_DOC.md
 ├── Makefile
 ├── USER_DOC.md
-├── scripts/ 				# Settuping script
+├── scripts/                      # Setup helpers
+│   ├── openssl-certificate-generation.conf
+│   └── setup-env.sh
 └── srcs/
     ├── docker-compose.yml
     ├── env/
@@ -31,113 +33,133 @@ inception /
     └── bonus/
         ├── adminer/
         ├── ftp/
+        ├── grafana/
+        ├── loki/
+        ├── promtail/
         ├── redis/
-        └── static-website/ #Service with my static web site
+        └── static-website/
 ```
 
 ---
 
 ## 3. Setting Up the Environment from Scratch
 
-### 3.1 Clone the Repository
+### 3.1 Clone the repository
 
 ```bash
-git clone <repository-url> inception 
-cd inception 
+git clone <repository-url> inseption
+cd inseption
 ```
 
-### 3.2 Quick Setup Script (recommended)
+### 3.2 Quick setup script
 
-You can setup the environment with:
+Recommended:
 
-```bash
-./scripts/setup-env.sh
-```
-or
 ```bash
 make setup
 ```
 
-
-The script asks for values and creates missing files in `srcs/env/` and
-`srcs/secrets/` (including TLS files in `srcs/secrets/ssl/`). It only creates
-files if they do not already exist.
-
-It also asks for your login, creates `/home/<login>/data/`, and updates
-`srcs/docker-compose.yml` (`volumes -> web-data -> device`) to that path.
-
-### 3.3 Create the `.env` File (manual)
-
-Docker Compose expects an environment file at `srcs/env/.env`. Create it with the
-variables referenced by the containers:
+Equivalent:
 
 ```bash
-cat > srcs/env/.env << 'EOF'
-# MariaDB / WordPress shared vars
-DB_NAME=wordpress
-DB_USER=wordpress
-DB_HOST=mariadb
+./scripts/setup-env.sh
+```
 
-# MariaDB admin user (value, not secret file)
-DB_ADMIN_USER=admin
+The script:
 
-# FTP user
-FTP_USER=user
+- checks that `srcs/docker-compose.yml` exists
+- checks that `scripts/openssl-certificate-generation.conf` exists
+- creates missing directories under `srcs/env/` and `srcs/secrets/`
+- asks for the host login used for the `web-data` bind mount
+- creates `/home/<login>/data/`
+- rewrites `volumes.web-data.driver_opts.device` in `srcs/docker-compose.yml`
+- asks for DB, admin, and FTP values
+- creates secret files only if they do not already exist
+- creates `srcs/env/.env` only if it does not already exist
+- generates TLS files only if they do not already exist
 
-# Secret file paths (Docker injects these automatically)
-DB_PASSWORD_FILE=/run/secrets/db_password
-DB_ADMIN_PASSWORD_FILE=/run/secrets/db_admin_password
-FTP_PASSWORD_FILE=/run/secrets/ftp_password
+### 3.3 Manual `.env` file
 
-# NGINX certificate paths
+Compose expects:
+
+```text
+srcs/env/.env
+```
+
+Current values written by `scripts/setup-env.sh`:
+
+```bash
 NGNIX_CRT_FILE=/run/secrets/ngnix_crt
 NGNIX_KEY_FILE=/run/secrets/ngnix_key
 
-# Redis for WordPress object cache
+DB_NAME=wordpress
+
+FTP_USER=user
+FTP_PASSWORD_FILE=/run/secrets/ftp_password
+
+DB_USER=wordpress
+DB_PASSWORD_FILE=/run/secrets/db_password
+
+DB_ADMIN_USER=admin
+DB_ADMIN_PASSWORD_FILE=/run/secrets/db_admin_password
+
+DB_HOST=mariadb
+
 REDIS_HOST=redis
 REDIS_PORT=6379
-EOF
 ```
 
-### 3.4 Populate Secrets
+Note: the variable names use `NGNIX`, matching the current repo spelling.
 
-Edit each file under `srcs/secrets/` with the desired values:
+### 3.4 Manual secrets
+
+The current repo expects these files:
 
 ```bash
-echo "YourDbPassword"      > srcs/secrets/db_password.txt
-echo "YourAdminPassword"   > srcs/secrets/db_admin_password.txt
-echo "YourFtpPassword"     > srcs/secrets/ftp_passwor.txt
+echo "YourDbPassword"    > srcs/secrets/db_password.txt
+echo "YourAdminPassword" > srcs/secrets/db_admin_password.txt
+echo "YourFtpPassword"   > srcs/secrets/ftp_passwor.txt
 ```
 
-### 3.5 Generate TLS Certificates (optional — already included)
+Note: `ftp_passwor.txt` is the current filename used by the Compose file and
+setup script.
 
-If you need to regenerate the self-signed certificate:
+### 3.5 TLS certificates
+
+Certificates are stored in:
+
+```text
+srcs/secrets/ssl/
+```
+
+The setup script generates them with:
 
 ```bash
-cd srcs/secrets/ssl
-
 openssl req -x509 -nodes -days 365 \
   -newkey rsa:2048 \
-  -keyout nginx.key \
-  -out nginx.crt \
-  -config openssl-certificate-generation.conf
-
-cd ../../..
+  -keyout srcs/secrets/ssl/nginx.key \
+  -out srcs/secrets/ssl/nginx.crt \
+  -config scripts/openssl-certificate-generation.conf
 ```
 
-The OpenSSL config sets `CN = nluchini.42.fr` with Subject Alternative Names
-for `localhost` and `127.0.0.1`.
+Current certificate config defaults:
 
-### 3.6 Create the Host Data Directory
+- `FQDN = example.42.fr`
+- SANs include `localhost` and `127.0.0.1`
 
-The `web-data` volume is bind-mounted from the host:
+If you want a different hostname in the certificate, edit
+`scripts/openssl-certificate-generation.conf` before generating it.
+
+### 3.6 Host data directory
+
+The `web-data` volume is a bind mount:
 
 ```bash
 mkdir -p /home/<your-login>/data/
 ```
 
-> This path is set in `srcs/docker-compose.yml` under `volumes -> web-data ->
-> device`. It must match your local machine path.
+The exact path is stored in:
+[srcs/docker-compose.yml](/home/nluchini/core/projects/inseption/srcs/docker-compose.yml)
 
 ---
 
@@ -145,110 +167,111 @@ mkdir -p /home/<your-login>/data/
 
 ### 4.1 Using the Makefile
 
-The Makefile in the project root wraps Docker Compose commands and already
-targets `srcs/docker-compose.yml` using `-f`.
+The Makefile wraps Compose commands with `-f srcs/docker-compose.yml`.
 
-| Command       | Action                                                           |
-|---------------|------------------------------------------------------------------|
-| `make up`     | Start all containers (`docker compose -f srcs/docker-compose.yml up`) |
-| `make down`   | Stop and remove containers                                       |
-| `make clean`  | Stop/remove containers and remove images (`--rmi all`)          |
-| `make fclean` | `clean` + remove volumes (`-v`)                                 |
-| `make re`     | Full rebuild: `clean` then `up`                                  |
+| Command       | Action |
+|---------------|--------|
+| `make up`     | `docker compose -f srcs/docker-compose.yml up` |
+| `make down`   | Stop and remove containers |
+| `make clean`  | `down --rmi all` |
+| `make fclean` | `down -v --rmi all` |
+| `make re`     | `make clean` then `make up` |
+| `make setup`  | Run `scripts/setup-env.sh` |
 
-### 4.2 Manual Docker Compose Commands
+### 4.2 Manual Compose commands
 
-From the `srcs/` directory:
+From the project root:
 
 ```bash
-# Build without starting
+docker compose -f srcs/docker-compose.yml build
+docker compose -f srcs/docker-compose.yml up -d --build
+docker compose -f srcs/docker-compose.yml ps
+docker compose -f srcs/docker-compose.yml logs -f
+docker compose -f srcs/docker-compose.yml config
+```
+
+From inside `srcs/`:
+
+```bash
 docker compose build
-
-# Start in detached mode
 docker compose up -d --build
-
-# View running containers
 docker compose ps
-
-# Follow combined logs
 docker compose logs -f
+docker compose config
 ```
 
 ---
 
 ## 5. Container Management
 
-### 5.1 Service Details
+### 5.1 Service details
 
-| Service     | Container Name | Base Image   | Entrypoint            | Exposed Ports        |
-|-------------|----------------|--------------|-----------------------|----------------------|
-| nginx       | `ngnix`        | debian:12    | `/setup.sh`           | 8443 → 443 (HTTPS)  |
-| wordpress   | `wordpress`    | debian:12    | `/setup.sh`           | 9000 (internal)      |
-| mariadb     | `mariadb`      | debian:12    | `/setup.sh`           | 3306 (internal)      |
-| redis       | `redis`        | debian:12    | redis-server          | 6379 (internal)      |
-| ftp-service | `ftp`          | debian:12    | `/setup.sh`           | 4321 → 21, 60000-60005 |
-| adminer     | `adminer`      | debian:12    | php-fpm8.2            | 9000 (internal)      |
-| my-syte     | `my-syte`      | debian:12    | caddy                 | 80 (internal)        |
+| Service     | Container Name | Base Image | Entrypoint / Command | Ports |
+|-------------|----------------|------------|----------------------|-------|
+| `nginx`     | `ngnix`        | `debian:12` | `/setup.sh` then `nginx -g "daemon off;"` | `8443:443` |
+| `wordpress` | `wordpress`    | `debian:12` | `/conf/setup.sh` then `php-fpm8.2 -F` | internal `9000` |
+| `mariadb`   | `mariadb`      | `debian:12` | `/setup.sh` then `mysqld --user=root` | internal `3306` |
+| `redis`     | `redis`        | `debian:12` | `redis-server /etc/redis/redis.conf` | internal `6379` |
+| `ftp-service` | `ftp`        | `debian:12` | `/setup.sh` | `4321:21`, `60000-60005:60000-60005` |
+| `adminer`   | `adminer`      | `debian:12` | `php-fpm8.2 -F` | internal `9000` |
+| `my-syte`   | `my-syte`      | `debian:12` | `caddy run --config /etc/caddy/Caddyfile --adapter caddyfile` | internal `80` |
+| `loki`      | `loki`         | custom build | image command | internal only |
+| `promtail`  | `promtail`     | custom build | image command | internal only |
+| `grafana`   | `grafana`      | custom build | image command | internal only |
 
-### 5.2 Executing Commands Inside Containers
+### 5.2 Running commands in containers
 
 ```bash
-# Open a shell inside a container
 docker exec -it mariadb bash
 docker exec -it wordpress bash
 docker exec -it ngnix bash
 
-# Run a one-off MySQL query
-docker exec mariadb mysql -u wordpress -p<password> -e "SHOW TABLES;" wordpress
-
-# Check PHP-FPM processes
+docker exec mariadb mysql -u wordpress -p'<password>' -e "SHOW TABLES;" wordpress
 docker exec wordpress ps aux | grep php-fpm
-
-# Test NGINX config
 docker exec ngnix nginx -t
 ```
 
-### 5.3 Restarting a Single Service
+### 5.3 Restarting a service
+
+From the project root:
 
 ```bash
-docker compose restart nginx
-docker compose restart wordpress
-docker compose restart mariadb
+docker compose -f srcs/docker-compose.yml restart nginx
+docker compose -f srcs/docker-compose.yml restart wordpress
+docker compose -f srcs/docker-compose.yml restart mariadb
 ```
 
-### 5.4 Rebuilding a Single Service
+### 5.4 Rebuilding a service
 
 ```bash
-docker compose build wordpress
-docker compose up -d wordpress
+docker compose -f srcs/docker-compose.yml build wordpress
+docker compose -f srcs/docker-compose.yml up -d wordpress
 ```
 
 ---
 
 ## 6. Networking
 
-All services are connected to a single Docker bridge network named `inception `.
+All services join the Compose network keyed as `inception`.
 
-```
-┌──────────────────────────────────────────────────┐
-│  Network: inception  (bridge)                     │
-│                                                  │
-│   ngnix ──────────▶ wordpress ──────▶ mariadb    │
-│   :443  FastCGI:9000           MySQL:3306        │
-└──────────────────────────────────────────────────┘
-        ▲
-        │ host port 8443
-        │
-    Browser
+Because the Compose file sets:
+
+```yaml
+name: test
 ```
 
-- **NGINX → WordPress**: FastCGI via `wordpress:9000` (configured in
-  `defualt.conf`).
-- **WordPress → MariaDB**: MySQL TCP via `mariadb:3306` (configured in
-  `wp-config.php` with `DB_HOST=mariadb`).
-- **WordPress → Redis**: TCP via `redis:6379` (configured with `REDIS_HOST` and
-  `REDIS_PORT`).
-- Only NGINX's port 443 is published to the host as **8443**.
+Docker runtime objects are created under that project name, so the actual
+runtime network name will be based on `test`, for example `test_inception`.
+
+Main traffic paths:
+
+- `ngnix -> wordpress:9000` via FastCGI
+- `wordpress -> mariadb:3306` via MySQL
+- `wordpress -> redis:6379` via TCP
+- `promtail -> loki`
+- `grafana -> loki`
+
+Only NGINX and FTP publish host ports in the current Compose file.
 
 ---
 
@@ -256,91 +279,118 @@ All services are connected to a single Docker bridge network named `inception `.
 
 ### 7.1 Volumes
 
-| Volume Name  | Type         | Container Mount Point | Host Path                  | Content                          |
-|--------------|--------------|-----------------------|----------------------------|----------------------------------|
-| `web-data`   | Bind mount   | `/var/www/html`       | `/home/nluchini/data/`     | WordPress files (PHP, uploads)   |
-| `data-base`  | Named volume | `/var/lib/mysql`      | Managed by Docker          | MariaDB database files           |
-| `redis-data` | Named volume | `/data`               | Managed by Docker          | Redis persistence data           |
+| Volume Name    | Type         | Mount Point        | Host Path / Storage        | Purpose |
+|----------------|--------------|--------------------|----------------------------|---------|
+| `web-data`     | Bind mount   | `/var/www/html`    | `/home/<login>/data/`      | Shared web files |
+| `data-base`    | Named volume | `/var/lib/mysql`   | Docker-managed             | MariaDB data |
+| `redis-data`   | Named volume | `/data`            | Docker-managed             | Redis data |
+| `loki-data`    | Named volume | `/loki`            | Docker-managed             | Loki data |
+| `grafana-data` | Named volume | `/var/lib/grafana` | Docker-managed             | Grafana data |
 
-### 7.2 Configuration Files (bind-mounted)
+### 7.2 Bind-mounted config files
 
-| Host Path                                              | Container Path                                     |
-|--------------------------------------------------------|----------------------------------------------------|
-| `srcs/requirements/nginx/conf/defualt.conf`            | `/etc/nginx/conf.d/defualt.conf`                   |
-| `srcs/requirements/wordpress/conf/www.conf`            | `/etc/php/8.2/fpm/pool.d/www.conf`                 |
-| `srcs/requirements/mariadb/conf/server.cnf`            | `/etc/mysql/mariadb.conf.d/50-server.cnf`          |
+| Host Path | Container Path |
+|-----------|----------------|
+| `srcs/requirements/nginx/conf/defualt.conf` | `/etc/nginx/conf.d/defualt.conf` |
+| `srcs/requirements/wordpress/conf/www.conf` | `/etc/php/8.2/fpm/pool.d/www.conf` |
+| `srcs/requirements/mariadb/conf/server.cnf` | `/etc/mysql/mariadb.conf.d/50-server.cnf` |
+| `srcs/bonus/ftp/conf/vsftpd.conf` | `/etc/vsftpd.conf` |
+| `srcs/bonus/static-website/conf/Caddyfile` | `/etc/caddy/Caddyfile` |
+| `srcs/bonus/grafana/grafana.ini` | `/etc/grafana/grafana.ini` |
+| `srcs/bonus/redis/conf/redis.conf` | `/etc/redis/redis.conf` |
 
-### 7.3 What Happens on `make clean`
+### 7.3 What `make clean` and `make fclean` remove
 
-Running `make clean` (i.e. `docker compose down --rmi all`) removes:
+`make clean` removes:
 
-- Containers, networks, and built images.
-- Volumes are preserved (`data-base`, `redis-data`, and bind-mounted `web-data`).
+- containers
+- networks
+- images
 
-To wipe all persistent data, use `make fclean` and then remove bind-mounted
-host files if needed:
+It keeps:
+
+- named volumes
+- bind-mounted host files such as `/home/<login>/data/`
+
+`make fclean` also removes Compose volumes, but it still does not delete files
+inside the host bind mount.
+
+To wipe the host bind-mounted files too:
 
 ```bash
 make fclean
-sudo rm -rf /home/nluchini/data/*
+rm -rf /home/<your-login>/data/*
 ```
 
 ---
 
-## 8. Entrypoint Scripts — How They Work
+## 8. Entrypoint Scripts
 
-Core services use a `setup.sh` entrypoint script before handing control to the
-main process via `exec "$@"`.
+### NGINX
 
-### NGINX (`requirements/nginx/tools/setup.sh`)
+File:
+[srcs/requirements/nginx/tools/setup.sh](/home/nluchini/core/projects/inseption/srcs/requirements/nginx/tools/setup.sh)
 
-1. Creates `/etc/nginx/ssl/` if it doesn't exist.
-2. Copies the TLS certificate and key from Docker secrets
-   (`/run/secrets/ngnix_crt`, `/run/secrets/ngnix_key`) into the SSL folder.
-3. Executes `nginx -g "daemon off;"`.
+Behavior:
 
-### MariaDB (`requirements/mariadb/tools/setup.sh`)
+1. Creates `/etc/nginx/ssl/` if needed.
+2. Copies secrets from `/run/secrets/ngnix_crt` and `/run/secrets/ngnix_key`.
+3. Starts NGINX in foreground mode.
 
-1. Reads database and admin passwords from Docker secrets, and admin username
-  from environment variable `DB_ADMIN_USER`.
-2. Creates the `/var/run/mysqld/` socket directory.
-3. Starts `mysqld` temporarily in the background.
-4. Waits until MariaDB accepts connections (`mysqladmin ping`).
-5. Creates the `wordpress` database, the `wordpress` user, and the admin user
-   with appropriate privileges.
-6. Shuts down the temporary server and then `exec`s the final `mysqld`.
+### MariaDB
 
-### WordPress (`requirements/wordpress/tools/setup.sh`)
+File:
+[srcs/requirements/mariadb/tools/setup.sh](/home/nluchini/core/projects/inseption/srcs/requirements/mariadb/tools/setup.sh)
 
-1. Reads the database password from Docker secrets.
-2. Waits for MariaDB to become available (retry loop with `mysql` client).
-3. If WordPress is not already installed, downloads and extracts the latest
-   release.
-4. Generates `wp-config.php` from the sample file, injecting database
-   credentials.
-5. Sets ownership to `www-data`.
-6. Executes `php-fpm8.2 -F` (foreground mode).
+Behavior:
+
+1. Reads DB passwords from Docker secrets.
+2. Creates `/var/run/mysqld/`.
+3. Starts `mysqld` temporarily.
+4. Waits for `mysqladmin ping`.
+5. Creates the configured database and users if missing.
+6. Stops the temporary server.
+7. Executes the final `mysqld`.
+
+### WordPress
+
+File:
+[srcs/requirements/wordpress/tools/setup.sh](/home/nluchini/core/projects/inseption/srcs/requirements/wordpress/tools/setup.sh)
+
+Behavior:
+
+1. Reads the DB password from Docker secrets.
+2. Waits until MariaDB answers queries.
+3. Downloads WordPress if it is not present in `/var/www/html`.
+4. Generates `wp-config.php` from the provided sample.
+5. Injects DB and Redis settings.
+6. Sets ownership to `www-data`.
+7. Starts PHP-FPM.
+
+Note: this script does not create the WordPress admin account. That still
+happens through the WordPress web installer.
+
+### FTP
+
+File:
+[srcs/bonus/ftp/tools/setup.sh](/home/nluchini/core/projects/inseption/srcs/bonus/ftp/tools/setup.sh)
+
+Behavior:
+
+1. Reads `FTP_USER` and `FTP_PASSWORD_FILE`.
+2. Creates the FTP user if it does not exist.
+3. Starts the FTP server process.
 
 ---
 
 ## 9. Useful Development Commands
 
+From the project root:
+
 ```bash
-# Full rebuild from scratch
 make re
-
-# Check container resource usage
 docker stats
-
-# Inspect a volume
-docker volume ls | grep -E "data-base|redis-data"
-
-# Prune unused Docker resources (images, containers, networks)
-docker system prune -a
-
-# View the full Compose config (with interpolated env vars)
-docker compose config
-
-# Tail only error logs from WordPress
-docker compose logs wordpress 2>&1 | grep -i error
+docker volume ls | grep -E "data-base|redis-data|loki-data|grafana-data"
+docker compose -f srcs/docker-compose.yml config
+docker compose -f srcs/docker-compose.yml logs wordpress 2>&1 | grep -i error
 ```
