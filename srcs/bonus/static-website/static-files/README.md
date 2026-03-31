@@ -1,4 +1,4 @@
-# Inseption Static Website
+# inception  Static Website
 
 This project is a simple static website designed to showcase a portfolio or present a resume. It is built using HTML, CSS, and JavaScript, and can be easily deployed using Docker.
 
@@ -28,12 +28,12 @@ To build and run the Docker container for this static website, follow these step
 
 2. **Build the Docker image**:
    ```bash
-   docker build -t inseption-static-website .
+   docker build -t inception -static-website .
    ```
 
 3. **Run the Docker container**:
    ```bash
-   docker run -d -p 8080:80 inseption-static-website
+   docker run -d -p 8080:80 inception -static-website
    ```
 
 4. **Access the website**:

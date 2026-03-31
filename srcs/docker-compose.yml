@@ -10,7 +10,7 @@ services:
       - loki-data:/loki
     restart: unless-stopped
     networks:
-      - inseption
+      - inception 
   
   promtail:
     build:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - loki
     networks:
-      - inseption
+      - inception 
   
   grafana:
     build:
@@ -37,7 +37,7 @@ services:
     depends_on:
       - loki
     networks:
-      - inseption
+      - inception 
 
   ftp-service:
     build:
@@ -46,7 +46,7 @@ services:
     container_name: ftp
     restart: on-failure:5
     networks:
-      - inseption
+      - inception 
     volumes:
       - ./bonus/ftp/conf/vsftpd.conf:/etc/vsftpd.conf
       - web-data:/var/www/html
@@ -67,7 +67,7 @@ services:
     container_name: my-syte
     restart: on-failure:5
     networks:
-      - inseption
+      - inception 
     volumes:
       - ./bonus/static-website/conf/Caddyfile:/etc/caddy/Caddyfile
       - ./bonus/static-website/static-files:/var/www/html
@@ -79,7 +79,7 @@ services:
     container_name: adminer
     restart: on-failure:5    
     networks:
-      - inseption
+      - inception 
     volumes:
       - ./bonus/adminer/conf/www.conf:/etc/php/8.2/fpm/pool.d/www.conf
 
@@ -90,7 +90,7 @@ services:
     container_name: redis
     restart: on-failure:5 
     networks:
-      - inseption
+      - inception 
     volumes:
       - ./bonus/redis/conf/redis.conf:/etc/redis/redis.conf
       - redis-data:/data
@@ -107,7 +107,7 @@ services:
       - "8443:443"
     restart: on-failure:5
     networks:
-      - inseption
+      - inception 
     depends_on:
       - wordpress
     secrets:
@@ -129,7 +129,7 @@ services:
       - db_password
     restart: on-failure:5
     networks:
-      - inseption
+      - inception 
     depends_on:
       - mariadb
       - redis
@@ -151,13 +151,13 @@ services:
       - db_admin_password
     restart: on-failure:5
     networks:
-      - inseption
+      - inception 
     volumes:
       - ./requirements/mariadb/conf/server.cnf:/etc/mysql/mariadb.conf.d/50-server.cnf
       - data-base:/var/lib/mysql
 
 networks:
-  inseption:
+  inception :
     driver:
       "bridge"
 

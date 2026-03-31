@@ -15,7 +15,7 @@
 ## 2. Repository Structure
 
 ```
-inseption/
+inception /
 ├── DEV_DOC.md
 ├── Makefile
 ├── USER_DOC.md
@@ -42,8 +42,8 @@ inseption/
 ### 3.1 Clone the Repository
 
 ```bash
-git clone <repository-url> inseption
-cd inseption
+git clone <repository-url> inception 
+cd inception 
 ```
 
 ### 3.2 Quick Setup Script (recommended)
@@ -227,11 +227,11 @@ docker compose up -d wordpress
 
 ## 6. Networking
 
-All services are connected to a single Docker bridge network named `inseption`.
+All services are connected to a single Docker bridge network named `inception `.
 
 ```
 ┌──────────────────────────────────────────────────┐
-│  Network: inseption (bridge)                     │
+│  Network: inception  (bridge)                     │
 │                                                  │
 │   ngnix ──────────▶ wordpress ──────▶ mariadb    │
 │   :443  FastCGI:9000           MySQL:3306        │

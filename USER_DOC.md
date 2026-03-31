@@ -12,7 +12,7 @@ the following services:
 | **MariaDB**   | Relational database that stores all WordPress data                  |
 
 All three services run as isolated Docker containers on a private bridge network
-called `inseption`. Only the NGINX container exposes a port to the host.
+called `inception `. Only the NGINX container exposes a port to the host.
 
 ```
 Browser ──HTTPS:8443──▶ NGINX ──FastCGI:9000──▶ WordPress (PHP-FPM)
@@ -26,7 +26,7 @@ Browser ──HTTPS:8443──▶ NGINX ──FastCGI:9000──▶ WordPress (P
 ## 2. Starting and Stopping the Project
 
 All commands are run from the **project root** directory
-(`/home/nluchini/core/projects/inseption`).
+(`/home/nluchini/core/projects/inception `).
 
 ### Optional: automatic environment setup
 
