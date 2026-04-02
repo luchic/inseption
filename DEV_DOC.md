@@ -208,7 +208,7 @@ docker compose config
 
 | Service     | Container Name | Base Image | Entrypoint / Command | Ports |
 |-------------|----------------|------------|----------------------|-------|
-| `nginx`     | `ngnix`        | `debian:12` | `/setup.sh` then `nginx -g "daemon off;"` | `8443:443` |
+| `nginx`     | `ngnix`        | `debian:12` | `/setup.sh` then `nginx -g "daemon off;"` | `443:443` |
 | `wordpress` | `wordpress`    | `debian:12` | `/conf/setup.sh` then `php-fpm8.2 -F` | internal `9000` |
 | `mariadb`   | `mariadb`      | `debian:12` | `/setup.sh` then `mysqld --user=root` | internal `3306` |
 | `redis`     | `redis`        | `debian:12` | `redis-server /etc/redis/redis.conf` | internal `6379` |

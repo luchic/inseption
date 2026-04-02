@@ -8,7 +8,7 @@ Core services:
 
 | Service       | Role                                                        |
 |---------------|-------------------------------------------------------------|
-| **NGINX**     | Reverse proxy and TLS termination on host port **8443**     |
+| **NGINX**     | Reverse proxy and TLS termination on host port **443**     |
 | **WordPress** | PHP-FPM application server for the WordPress site           |
 | **MariaDB**   | Database used by WordPress                                  |
 
@@ -28,7 +28,7 @@ Only the following ports are published to the host by default:
 
 | Service | Host Port | Container Port |
 |---------|-----------|----------------|
-| NGINX   | 8443      | 443            |
+| NGINX   | 443      | 443            |
 | FTP     | 4321      | 21             |
 | FTP     | 60000-60005 | 60000-60005  |
 
@@ -118,7 +118,7 @@ Equivalent to `make clean` followed by `make up`.
 Open:
 
 ```text
-https://localhost:8443
+https://localhost:443
 ```
 
 If you configure local DNS or `/etc/hosts`, you can also use the hostname
@@ -127,7 +127,7 @@ present in your certificate.
 ### WordPress admin panel
 
 ```text
-https://localhost:8443/wp-admin
+https://localhost:443/wp-admin
 ```
 
 The database connection is configured automatically by the container setup, but
@@ -217,8 +217,8 @@ docker compose -f srcs/docker-compose.yml logs -f
 
 | Check                    | Command |
 |--------------------------|---------|
-| NGINX responds on 8443   | `curl -k https://localhost:8443` |
-| WordPress login page     | `curl -k https://localhost:8443/wp-login.php` |
+| NGINX responds on 443   | `curl -k https://localhost:443` |
+| WordPress login page     | `curl -k https://localhost:443/wp-login.php` |
 | MariaDB accepts requests | `docker exec mariadb mysqladmin ping` |
 | Compose services status  | `docker compose -f srcs/docker-compose.yml ps` |
 
