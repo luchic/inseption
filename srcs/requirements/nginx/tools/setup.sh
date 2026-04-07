@@ -24,14 +24,6 @@ else
 	cp /run/secrets/ngnix_key "${SSL_FOLDER}/nginx.key"
 fi
 
-# ssl_certificate      /etc/nginx/ssl/nginx.crt;
-# ssl_certificate_key  /etc/nginx/ssl/nginx.key;
-
-# NGNIX_CRT_FILE=/run/secrets/ngnix_crt
-# NGNIX_KEY_FILE=/run/secrets/ngnix_key
-
-# chown -R www-data:www-data /var/www/html
-
 echo "Starting ngninix ..."
 
 exec "$@"
